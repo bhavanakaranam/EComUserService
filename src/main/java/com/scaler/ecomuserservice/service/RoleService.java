@@ -5,6 +5,7 @@ import com.scaler.ecomuserservice.models.Role;
 import com.scaler.ecomuserservice.repository.RoleRepository;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +15,7 @@ public class RoleService
 {
     private RoleRepository roleRepository;
 
+    @Autowired
     public RoleService(RoleRepository roleRepository)
     {
         this.roleRepository = roleRepository;
