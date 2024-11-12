@@ -10,6 +10,9 @@ import com.scaler.ecomuserservice.models.Session;
 import com.scaler.ecomuserservice.models.SessionStatus;
 import com.scaler.ecomuserservice.repository.SessionRepository;
 import com.scaler.ecomuserservice.repository.UserRepository;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -21,10 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMapAdapter;
 
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import javax.crypto.SecretKey;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 @Getter
@@ -53,7 +55,20 @@ public class AuthService
         if(!user.getPassword().equals(password))
             throw new InvalidCredentialException("Invalid userId or password");
 
-        String token = RandomStringUtils.randomAlphanumeric(10);
+        // JWT Token Generation
+        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+        // Add the claims
+        Map<String, Object> jsonForJWT = new HashMap<>();
+        jsonForJWT.put("userId", user.getId());
+        jsonForJWT.put("roles", user.getRoles());
+        jsonForJWT.put("createdAt", new Date());
+        jsonForJWT.put("expiryAt", new Date(LocalDate.now().plusDays(3).toEpochDay()));
+
+        String token = Jwts.builder().addClaims(jsonForJWT).signWith(key).compact();
+
+        // Random alphanumeric String
+        // String token = RandomStringUtils.randomAlphanumeric(10);
 
         // Create session
         Session session = new Session();
