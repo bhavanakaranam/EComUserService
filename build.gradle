@@ -26,6 +26,13 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    // Core Spring Security OAuth2 support
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    // Spring Security support for OAuth2 with JWT
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
     implementation 'org.postgresql:postgresql'
     implementation 'org.apache.commons:commons-lang3:3.5'
     // JWT library for encoding and decoding JWT tokens

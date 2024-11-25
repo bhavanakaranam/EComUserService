@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMapAdapter;
 
@@ -37,11 +38,14 @@ public class AuthService
 
     private final SessionRepository sessionRepository;
 
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Autowired
-    public AuthService(UserRepository userRepository, SessionRepository sessionRepository)
+    public AuthService(UserRepository userRepository, SessionRepository sessionRepository, BCryptPasswordEncoder bCryptPasswordEncoder)
     {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public ResponseEntity<UserDTO> login(String email, String password) throws UserNotFoundException, InvalidCredentialException
@@ -52,7 +56,7 @@ public class AuthService
             throw new UserNotFoundException("User with "+email+" not found.");
 
         ECom_User user = userOptional.get();
-        if(!user.getPassword().equals(password))
+        if(!this.bCryptPasswordEncoder.matches(password, user.getPassword()))
             throw new InvalidCredentialException("Invalid userId or password");
 
         // JWT Token Generation
@@ -92,7 +96,7 @@ public class AuthService
     {
         ECom_User user = new ECom_User();
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(this.bCryptPasswordEncoder.encode(password));
         ECom_User savedUser = userRepository.save(user);
         return UserDTO.from(savedUser);
     }
